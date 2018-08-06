@@ -1,28 +1,49 @@
 {
-  "name": "keyboardio-led-pallette",
-  "version": "0.0.0",
+  "name": "keyboardio-led-custom-palette",
+  "version": "1.0.0",
   "license": "MIT",
+  "author": {
+    "name": "Jakub Beneš",
+    "email": "jukben@gmail.com"
+  },
+  "homepage": "https://github.com/jukben/keyboardio-led-custom-palette",
   "scripts": {
     "dev": "electron-webpack dev",
     "compile": "electron-webpack",
-    "dist": "yarn compile && electron-builder",
-    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
+    "build:mac": "yarn compile && electron-builder -m",
+    "build:win": "yarn compile && electron-builder -w"
+  },
+  "build": {
+    "appId": "com.jukben.lcp",
+    "productName": "LED Custom Palette",
+    "copyright": "Copyright © 2018 Jakub Beneš, distributed under MIT license"
   },
   "dependencies": {
-    "@babel/preset-react": "^7.0.0-beta.56",
-    "babel-preset-react": "^6.24.1",
+    "@babel/core": "7.0.0-beta.47",
+    "@babel/plugin-proposal-class-properties": "7.0.0-beta.47",
+    "@babel/preset-env": "7.0.0-beta.47",
+    "@babel/preset-react": "7.0.0-beta.47",
+    "@babel/runtime": "7.0.0-beta.47",
+    "babel-loader": "^7.1.5",
+    "most": "^1.7.3",
+    "ramda": "^0.25.0",
     "react": "^16.4.2",
+    "react-color": "^2.14.1",
     "react-dom": "^16.4.2",
+    "serialport": "^6.2.2",
     "source-map-support": "^0.5.5",
     "styled-components": "^3.4.1"
   },
   "devDependencies": {
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.4.2",
     "electron": "2.0.0",
     "electron-builder": "^20.11.1",
     "electron-webpack": "^2.0.1",
+    "jest": "^23.4.2",
     "webpack": "^4.8.1"
   },
-  "resolutions": {
-    "webpack-sources": "1.0.1"
+  "jest": {
+    "testEnvironment": "node"
   }
 }

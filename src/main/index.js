@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from "electron";
-import * as path from "path";
+import { app, BrowserWindow, Menu, shell } from "electron";
 import { format as formatUrl } from "url";
+import * as path from "path";
+import { homepage } from "../../package.json";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -8,7 +9,13 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 let mainWindow;
 
 function createMainWindow() {
-  const window = new BrowserWindow();
+  const window = new BrowserWindow({
+    maxWidth: 800,
+    maxHeight: 600,
+    minHeight: 490,
+    minWidth: 700,
+    resizable: false
+  });
 
   if (isDevelopment) {
     window.webContents.openDevTools();
@@ -36,6 +43,24 @@ function createMainWindow() {
       window.focus();
     });
   });
+
+  const menu = Menu.buildFromTemplate([
+    {
+      role: "window",
+      submenu: [
+        {
+          label: "About",
+          click() {
+            shell.openExternal(homepage);
+          }
+        },
+        { role: "minimize" },
+        { role: "close" }
+      ]
+    }
+  ]);
+
+  Menu.setApplicationMenu(menu);
 
   return window;
 }
