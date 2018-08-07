@@ -58,6 +58,8 @@ export default class Provider extends React.Component {
   data$ = never();
   reconnect$ = periodic(3000).observe(async e => {
     const { inSync: { error }, comName, fatalError } = this.state;
+
+    // do not reconnect if are not facing any error.. or if error is fatal
     if (!error || fatalError) return;
 
     console.log("Trying to reconnect...");
