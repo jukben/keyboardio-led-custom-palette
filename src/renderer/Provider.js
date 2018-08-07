@@ -36,6 +36,7 @@ const DEFAULT_STATE = {
   comName: null,
   activeColorIndex: 0,
   inSync: { status: false, error: true },
+  fatalError: false,
   setColorPalette: null,
   syncKeyboard: null,
   resetColorPalette: null
@@ -47,12 +48,17 @@ export const Consumer = Store.Consumer;
 
 export const SERIAL_OK = ".";
 
+export const ERROR = {
+  RECOVER: "RECOVER",
+  FATAL: "ERROR_FATAL"
+};
+
 export default class Provider extends React.Component {
   port = null;
   data$ = never();
   reconnect$ = periodic(3000).observe(async e => {
-    const { inSync: { error }, comName } = this.state;
-    if (!error) return;
+    const { inSync: { error }, comName, fatalError } = this.state;
+    if (!error || fatalError) return;
 
     console.log("Trying to reconnect...");
     this.connect();
@@ -61,12 +67,40 @@ export default class Provider extends React.Component {
   state = DEFAULT_STATE;
 
   componentWillUnmount() {
-    this.port.close();
+    this.closeSerial();
   }
 
+  errorReducer = e => {
+    switch (e) {
+      case ERROR.FATAL:
+        this.setState(
+          evolve({
+            fatalError: T
+          })
+        );
+        this.closeSerial();
+        break;
+      default:
+        this.setState(
+          evolve({
+            inSync: {
+              error: T
+            }
+          })
+        );
+    }
+  };
+
   async getData() {
-    const palette = getRGBArrayFromPalette(await this.sendCommand("palette"));
-    const layout = getLayout(await this.sendCommand("lcp.map"));
+    let palette;
+    let layout;
+    try {
+      palette = getRGBArrayFromPalette(await this.sendCommand("palette", true));
+      layout = getLayout(await this.sendCommand("lcp.map", true));
+    } catch (e) {
+      this.errorReducer(e);
+      return;
+    }
 
     this.setState(
       evolve({
@@ -75,7 +109,8 @@ export default class Provider extends React.Component {
         inSync: {
           status: T,
           error: F
-        }
+        },
+        fatalError: F
       })
     );
   }
@@ -131,19 +166,14 @@ export default class Provider extends React.Component {
     }
 
     try {
-      await this.sendCommand(`palette ${getPaletteFromRGBArray(palette)}`);
-      await this.sendCommand(`lcp.map ${getLayoutFromArray(layout)}`);
-    } catch (e) {
-      console.error(`[syncKeyboard] Error in synchronization: ${e}`);
-      this.setState(
-        evolve({
-          inSync: {
-            error: always(
-              "Unable to synchronize! It's your Model01 still plugged in?"
-            )
-          }
-        })
+      await this.sendCommand(
+        `palette ${getPaletteFromRGBArray(palette)}`,
+        true
       );
+      await this.sendCommand(`lcp.map ${getLayoutFromArray(layout)}`, true);
+    } catch (e) {
+      this.errorReducer(e);
+      console.error(`[syncKeyboard] Error in synchronization: ${e}`);
       return;
     }
 
@@ -155,6 +185,10 @@ export default class Provider extends React.Component {
         }
       })
     );
+  };
+
+  closeSerial = () => {
+    this.port.close();
   };
 
   createSerial(com) {
@@ -183,7 +217,7 @@ export default class Provider extends React.Component {
     this.data$ = on$.until(error$);
   }
 
-  async sendCommand(command) {
+  async sendCommand(command, reply = false) {
     if (!command) {
       throw new Error("Serial communication fatal error, command is missing");
     }
@@ -201,16 +235,20 @@ export default class Provider extends React.Component {
         .subscribe({
           next: message => {
             if (message.trim() === SERIAL_OK) {
-              return res(SERIAL_OK);
+              if (reply) {
+                return rej(ERROR.FATAL);
+              } else {
+                return res(SERIAL_OK);
+              }
             }
 
             res(message);
           },
           error: e => {
-            throw new Error(`[sendCommand] Something is wrong! ${e}`);
+            throw new Error(ERROR.FATAL);
           },
-          complete: e => {
-            rej(`Timeout on command ${command}, last event: "${e}"`);
+          complete: () => {
+            rej(ERROR.RECOVER);
           }
         });
     });
@@ -219,7 +257,8 @@ export default class Provider extends React.Component {
   async connect() {
     const serials = await SerialPort.list();
     const keyboard = serials.filter(
-      ({ manufacturer }) => manufacturer === "Keyboardio"
+      ({ manufacturer, serialNumber = "" }) =>
+        manufacturer === "Keyboardio" || serialNumber.match(/kbio/)
     )[0];
 
     if (!keyboard) {
@@ -236,13 +275,24 @@ export default class Provider extends React.Component {
   }
 
   render() {
-    const { palette, layout, activeColorIndex, comName, inSync } = this.state;
+    const {
+      palette,
+      layout,
+      activeColorIndex,
+      comName,
+      inSync,
+      fatalError
+    } = this.state;
 
     const configurationLoaded = palette && layout;
 
     return (
       <>
-        {!configurationLoaded && <Loader />}
+        {!configurationLoaded && (
+          <div>
+            <Loader fatalError={fatalError} />
+          </div>
+        )}
         {configurationLoaded && (
           <Store.Provider
             value={{

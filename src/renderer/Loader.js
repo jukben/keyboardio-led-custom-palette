@@ -8,12 +8,35 @@ const Container = styled.div`
   position: absolute;
   z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+`;
+
+const Text = styled.div`
   font-size: 30px;
 `;
 
-const Loader = () => <Container>Searching for the serial port...</Container>;
+const FatalErrorHelp = styled.div`
+  border: 3px solid #ff6b6b;
+  padding: 10px;
+  margin: 20px;
+  color: #ff6b6b;
+  line-height: 23px;
+`;
+
+const Loader = ({ fatalError }) => (
+  <Container>
+    <Text>Searching for the Model01...</Text>
+    {fatalError && (
+      <FatalErrorHelp>
+        Something is terribly wrong. <br /> Most likely your firmware's missing
+        correct installation of "LEDCustomPalette" plugin <br />
+        Check out the documentation. Flash your Model01. Run this again. ❤️
+      </FatalErrorHelp>
+    )}
+  </Container>
+);
 
 export default Loader;
