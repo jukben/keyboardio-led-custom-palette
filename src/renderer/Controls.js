@@ -47,9 +47,14 @@ const SmallButton = styled.button`
     outline: none;
   }
 
-  &:hover {
+  &:not(:disabled):hover {
     cursor: pointer;
     color: #798899;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: no-drop;
   }
 `;
 
@@ -97,10 +102,15 @@ export default class Controls extends React.Component {
     return (
       <Container>
         <Consumer>
-          {({ syncKeyboard, inSync: { status, error }, resetPalette }) => (
+          {({
+            syncKeyboard,
+            fatalError,
+            inSync: { status, error },
+            resetPalette
+          }) => (
             <>
               <Help>
-                <SmallButton disabled={!status} onClick={resetPalette}>
+                <SmallButton disabled={status} onClick={resetPalette}>
                   reset color palette
                 </SmallButton>
               </Help>
@@ -108,8 +118,9 @@ export default class Controls extends React.Component {
                 <Status>
                   {error ? (
                     <ErrorBox>
-                      There is an error within communication! Try to reconnect
-                      your keyboard. 🙏
+                      {fatalError
+                        ? "There is an error within communication! Try to reconnect your keyboard. 🙏"
+                        : "There is an fatal error occurred. Try to restart the app. 😔"}
                     </ErrorBox>
                   ) : status ? (
                     <Green>Everything is OK 👌</Green>

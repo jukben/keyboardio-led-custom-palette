@@ -35,11 +35,8 @@ const DEFAULT_STATE = {
   layout: null,
   comName: null,
   activeColorIndex: 0,
-  inSync: { status: false, error: true },
   fatalError: false,
-  setColorPalette: null,
-  syncKeyboard: null,
-  resetColorPalette: null
+  inSync: { status: false, error: true }
 };
 
 const Store = React.createContext(DEFAULT_STATE);
@@ -77,7 +74,10 @@ export default class Provider extends React.Component {
       case ERROR.FATAL:
         this.setState(
           evolve({
-            fatalError: T
+            fatalError: T,
+            inSync: {
+              error: T
+            }
           })
         );
         this.closeSerial();
@@ -118,27 +118,26 @@ export default class Provider extends React.Component {
   }
 
   setColorPalette = (id, color) => {
-    const palette = [...this.state.palette];
-
-    palette[id] = color;
-
     this.setState(
       evolve({
-        palette: always(palette),
-        isSync: {
-          status: F
+        palette: adjust(always(color), id),
+        activeColorIndex: always(id),
+        inSync: {
+          status: always(inSync)
         }
       })
     );
   };
 
   resetPalette = () => {
-    this.setState({
-      palette: DEFAULT_PALETTE,
-      isSync: {
-        status: F
-      }
-    });
+    this.setState(
+      evolve({
+        palette: always(DEFAULT_PALETTE),
+        inSync: {
+          status: F
+        }
+      })
+    );
   };
 
   setKeyColor = keyId => {
@@ -176,6 +175,7 @@ export default class Provider extends React.Component {
       return;
     }
 
+    console.log("...sync OK");
     this.setState(
       evolve({
         inSync: {
@@ -244,7 +244,16 @@ export default class Provider extends React.Component {
             res(message);
           },
           error: e => {
-            throw new Error(ERROR.FATAL);
+            console.error("[sendCommand] error", e);
+            this.setState(
+              evolve({
+                fatalError: T,
+                inSync: {
+                  status: F,
+                  error: T
+                }
+              })
+            );
           },
           complete: () => {
             rej(ERROR.RECOVER);
@@ -298,6 +307,7 @@ export default class Provider extends React.Component {
               palette,
               layout,
               inSync,
+              fatalError,
               activeColorIndex,
               setKeyColor: this.setKeyColor,
               setColorPalette: this.setColorPalette,
