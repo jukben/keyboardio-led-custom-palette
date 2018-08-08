@@ -8,7 +8,8 @@
   },
   "homepage": "https://github.com/jukben/keyboardio-led-custom-palette",
   "scripts": {
-    "dev": "electron-webpack dev",
+    "test": "jest",
+    "start": "electron-webpack dev",
     "compile": "electron-webpack",
     "build:mac": "yarn compile && electron-builder -m",
     "build:win": "yarn compile && electron-builder -w"
