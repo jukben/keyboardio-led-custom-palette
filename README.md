@@ -77,7 +77,7 @@ Do you miss something? Open an issue, I'd like to hear more about your use case.
 
 ## Thanks
 
-To my lovely [Natalie](https://twitter.com/nataliesimcik) for a great app icon. ❤️
+To my lovely [@nataliesimcik](https://www.instagram.com/nataliesimcik/) for a great app icon. ❤️
 
 ## License
 
