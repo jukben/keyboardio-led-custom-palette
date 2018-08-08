@@ -21,6 +21,11 @@ const Button = styled.button`
   border-radius: 4px;
   transition: 0.1s all;
 
+  &:focus,
+  &:active {
+    outline: none;
+  }
+
   &:not(:disabled):hover {
     cursor: pointer;
     background: #a73742;
@@ -36,6 +41,12 @@ const SmallButton = styled.button`
   border: none;
   color: #556270;
   background: white;
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+
   &:hover {
     cursor: pointer;
     color: #798899;
