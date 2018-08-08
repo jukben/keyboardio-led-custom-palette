@@ -28,7 +28,7 @@ The other way is to build the application by your own – see [Contributing](#co
 
 To usage you have to enhance your Model01's firmware with [Kaleidoscope-LEDCustomPalette](https://github.com/jukben/Kaleidoscope-LEDCustomPalette). See the documentation for more information and example.
 
-Once you successfully flash your keyboard's firmware you should be able to run the application successfully. The LED Custom Palette then automatically find the serial port of your keyboard and if you have configured the plugin correctly you will be welcomed with a default state of the application with Palette, Layout and Status Bar.
+Once you successfully flash your keyboard's firmware you should be able to run the application successfully. The LED Custom Palette then automatically find the serial port of your keyboard and if you have configured the plugin correctly you will be welcomed with a default state of the application with Palette, Layout and Status Bar component.
 
 ### Palette
 
@@ -44,7 +44,7 @@ Left mouse click to set the specific keycap with the currently selected color.
 
 On left you have a information if your design is in sync with Model01's one. On right you have the sync button – once you click on it, the design will be uploaded into your keyboard and will be persisted across the runs.
 
-The is little "reset color palette" button to reset the palette with [An Optimum 16 Color Palette](http://alumni.media.mit.edu/~wad/color/palette.html).
+There is a little "reset color palette" button to reset the palette with [An Optimum 16 Color Palette](http://alumni.media.mit.edu/~wad/color/palette.html).
 
 ## Contributing
 
@@ -52,7 +52,7 @@ Required [Node.js](http://nodejs.org/) (8+) stack.
 
 You should be able to build the project pretty easily by your own. Just `yarn` to install all dependencies.
 
-On Windows you need workings stack I'd recommend [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools).
+On Windows you would need a properly configured stack, I'd recommend [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools).
 
 Haven't tried Linux (PR welcomed 😉)
 
