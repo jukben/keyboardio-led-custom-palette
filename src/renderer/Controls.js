@@ -2,12 +2,12 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { Consumer } from "./Provider";
 
-const Error = styled.div`
+const ErrorBox = styled.div`
   border: 2px solid #ff6b6b;
   text-align: center;
-  padding: 10px;
-  background: white;
   color: #ff6b6b;
+  background: white;
+  padding: 5px;
 `;
 
 const Button = styled.button`
@@ -57,6 +57,7 @@ const Container = styled.div`
   font-family: Arial, Helvetica, sans-serif;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: flex-end;
 `;
 
@@ -71,6 +72,7 @@ const Panel = styled.div`
   background: #556270;
   width: 100vw;
   display: flex;
+  align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
   padding: 5px;
@@ -84,7 +86,11 @@ const Red = styled.span`
   color: #4ecdc4;
 `;
 
-const Status = styled.div``;
+const Status = styled.div`
+  padding: 5px;
+  justify-content: center;
+  align-items: center;
+`;
 
 export default class Controls extends React.Component {
   render() {
@@ -99,26 +105,22 @@ export default class Controls extends React.Component {
                 </SmallButton>
               </Help>
               <Panel>
-                {error && (
-                  <Error>
-                    There is an error within communication!<br />
-                    Try to reconnect your Model01 🙏
-                  </Error>
-                )}
-                {!error && (
-                  <>
-                    <Status>
-                      {status ? (
-                        <Green>Everything is OK 👌</Green>
-                      ) : (
-                        <Red>Design is not synced with Model01! 🙅</Red>
-                      )}
-                    </Status>
-                    <Button onClick={syncKeyboard} disabled={status}>
-                      Synchronize! 🚀
-                    </Button>
-                  </>
-                )}
+                <Status>
+                  {error ? (
+                    <ErrorBox>
+                      There is an error within communication! Try to reconnect
+                      your keyboard. 🙏
+                    </ErrorBox>
+                  ) : status ? (
+                    <Green>Everything is OK 👌</Green>
+                  ) : (
+                    <Red>Design is not synced with Model01! 🙅</Red>
+                  )}
+                </Status>
+
+                <Button onClick={syncKeyboard} disabled={status}>
+                  Synchronize! 🚀
+                </Button>
               </Panel>
             </>
           )}

@@ -160,7 +160,7 @@ export default class Provider extends React.Component {
   };
 
   syncKeyboard = async () => {
-    console.log("sync");
+    console.log("Attempt to sync the keyboard...");
     const { palette, layout } = this.state;
 
     if (!palette || !layout) {
@@ -168,11 +168,8 @@ export default class Provider extends React.Component {
     }
 
     try {
-      await this.sendCommand(
-        `palette ${getPaletteFromRGBArray(palette)}`,
-        true
-      );
-      await this.sendCommand(`lcp.map ${getLayoutFromArray(layout)}`, true);
+      await this.sendCommand(`palette ${getPaletteFromRGBArray(palette)}`);
+      await this.sendCommand(`lcp.map ${getLayoutFromArray(layout)}`);
     } catch (e) {
       this.errorReducer(e);
       console.error(`[syncKeyboard] Error in synchronization: ${e}`);
