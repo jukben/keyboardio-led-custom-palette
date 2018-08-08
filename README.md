@@ -14,7 +14,7 @@
 
 ## Introduction
 
-<img src="https://user-images.githubusercontent.com/8135252/43808306-bc76ae92-9aac-11e8-807e-61b962404de1.png"/>
+<img src="https://user-images.githubusercontent.com/8135252/43836905-1e88cd3a-9b17-11e8-933e-072f88676dad.png" alt="Screenshot" title="Main screen"/>
 
 This is a small utility for my lovely keyboard – [Model01 Keyboard](https://shop.keyboard.io/) - it basically allows you to design your own color layout and then store it EEPROM thus it will be persisted in your keyboard.
 
