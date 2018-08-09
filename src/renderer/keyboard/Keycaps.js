@@ -48,7 +48,7 @@ class Keys extends React.Component {
   }
 }
 
-export default class Keycaps extends React.Component {
+export default class Keycaps extends React.PureComponent {
   render() {
     const { layout, palette, set, map } = this.props;
 
@@ -268,7 +268,6 @@ export default class Keycaps extends React.Component {
         />
         <path
           d="m5279.9 999.61s-174.14 83.071-255.62 140.2c-12.483 8.738-22.654 23.646-17.25 42.367l77.879 270.48c5.404 18.733 13.542 26.267 32.258 20.867l280.15-80.717c18.733-5.388 20.817-12.888 15.429-31.604l-99.512-345.56c-5.388-18.716-16.242-25.408-33.334-16.033z"
-          dataId="44"
           dataId="43"
         />
         <path

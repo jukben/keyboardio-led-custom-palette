@@ -4,18 +4,20 @@ import styled from "styled-components";
 import { GithubPicker } from "react-color";
 import { Consumer } from "../Provider";
 import Keycaps from "./Keycaps";
+import LayerControls from "./LayerControls";
 
 const KeyboardContainer = styled.div`
+  position: relative;
   flex: 1;
-  align-self: auto;
   width: 100%;
   max-width: 800px;
+  align-self: auto;
 `;
 
-function getKeysMap(layout, palette) {
-  if (!layout) return [];
+function getColorMapForActiveLayout({ layouts, palette }, activeLayoutIndex) {
+  if (!layouts || !layouts[activeLayoutIndex]) return [];
 
-  return layout.map(e => {
+  return layouts[activeLayoutIndex].map(e => {
     return palette[e];
   });
 }
@@ -24,8 +26,20 @@ export default class Keyboard extends React.Component {
   render() {
     return (
       <Consumer>
-        {({ layout, palette, setKeyColor }) => (
+        {({
+          layouts,
+          palette,
+          numberOfLayouts,
+          activeLayoutIndex,
+          setKeyColor,
+          setLayer
+        }) => (
           <KeyboardContainer>
+            <LayerControls
+              set={setLayer}
+              count={numberOfLayouts}
+              activeIndex={activeLayoutIndex}
+            />
             <svg
               xmlns="http://www.w3.org/2000/svg"
               clipRule="evenodd"
@@ -34,7 +48,16 @@ export default class Keyboard extends React.Component {
               version="1.1"
               viewBox="0 0 8534 4334"
             >
-              <Keycaps map={getKeysMap(layout, palette)} set={setKeyColor} />
+              <Keycaps
+                map={getColorMapForActiveLayout(
+                  {
+                    layouts,
+                    palette
+                  },
+                  activeLayoutIndex
+                )}
+                set={setKeyColor}
+              />
               <g fill="#000" fillRule="nonzero">
                 <path d="m3064 3041.2c0 9.213-7.47 16.667-16.666 16.667-9.213 0-16.667-7.454-16.667-16.667 0-9.196 7.454-16.667 16.667-16.667 9.196 0 16.666 7.471 16.666 16.667" />
                 <path d="m5502.7 3041.2c0 9.213-7.471 16.667-16.667 16.667-9.212 0-16.666-7.454-16.666-16.667 0-9.196 7.454-16.667 16.666-16.667 9.196 0 16.667 7.471 16.667 16.667" />

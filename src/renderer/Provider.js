@@ -1,14 +1,15 @@
 import React from "react";
 import SerialPort from "serialport";
 import { fromEvent, never, from, periodic, constant, of } from "most";
-import { evolve, always, adjust, F, T } from "ramda";
+import { evolve, always, clamp, adjust, F, T } from "ramda";
 import {
   getRGBArrayFromPalette,
   getPaletteFromRGBArray,
-  getLayoutFromArray,
-  getLayout
+  getLayoutsFromArray,
+  getLayouts
 } from "../common/utils";
 import Loader from "./Loader";
+import { startOfISOWeek } from "date-fns";
 
 // http://alumni.media.mit.edu/~wad/color/palette.html
 const DEFAULT_PALETTE = [
@@ -32,8 +33,10 @@ const DEFAULT_PALETTE = [
 
 const DEFAULT_STATE = {
   palette: null,
-  layout: null,
+  layouts: null,
   comName: null,
+  numberOfLayouts: 1,
+  activeLayoutIndex: 0,
   activeColorIndex: 0,
   fatalError: false,
   inSync: { status: false, error: true }
@@ -95,27 +98,34 @@ export default class Provider extends React.Component {
 
   async getData() {
     let palette;
-    let layout;
+    let layouts;
     try {
       palette = getRGBArrayFromPalette(await this.sendCommand("palette", true));
-      layout = getLayout(await this.sendCommand("lcp.map", true));
+      layouts = getLayouts(await this.sendCommand("colormap.map", true));
     } catch (e) {
       this.errorReducer(e);
       return;
     }
 
-    this.setState(
-      evolve({
-        palette: always(palette),
-        layout: always(layout),
-        inSync: {
-          status: T,
-          error: F
-        },
-        fatalError: F
-      })
-    );
+    this.setState({
+      numberOfLayouts: layouts.length,
+      palette: palette,
+      layouts: layouts,
+      fatalError: false,
+      inSync: {
+        status: true,
+        error: false
+      }
+    });
   }
+
+  setLayer = layerId => {
+    const { layouts } = this.state;
+
+    this.setState({
+      activeLayoutIndex: clamp(0, layouts.length - 1, layerId)
+    });
+  };
 
   setColorPalette = (id, color) => {
     this.setState(
@@ -123,7 +133,7 @@ export default class Provider extends React.Component {
         palette: adjust(always(color), id),
         activeColorIndex: always(id),
         inSync: {
-          status: always(inSync)
+          status: F
         }
       })
     );
@@ -141,10 +151,14 @@ export default class Provider extends React.Component {
   };
 
   setKeyColor = keyId => {
-    const { layout, activeColorIndex } = this.state;
+    const { layouts, activeColorIndex, activeLayoutIndex } = this.state;
+
     this.setState(
       evolve({
-        layout: adjust(always(activeColorIndex), keyId),
+        layouts: adjust(
+          adjust(always(activeColorIndex), keyId),
+          activeLayoutIndex
+        ),
         inSync: {
           status: F
         }
@@ -160,15 +174,15 @@ export default class Provider extends React.Component {
 
   syncKeyboard = async () => {
     console.log("Attempt to sync the keyboard...");
-    const { palette, layout } = this.state;
+    const { palette, layouts } = this.state;
 
-    if (!palette || !layout) {
+    if (!palette || !layouts) {
       throw new Error("[syncKeyboard] Doesn't have a data to synchronize");
     }
 
     try {
-      await this.sendCommand(`palette ${getPaletteFromRGBArray(palette)}`);
-      await this.sendCommand(`lcp.map ${getLayoutFromArray(layout)}`);
+      // await this.sendCommand(`palette ${getPaletteFromRGBArray(palette)}`);
+      await this.sendCommand(`colormap.map ${getLayoutsFromArray(layouts)}`);
     } catch (e) {
       this.errorReducer(e);
       console.error(`[syncKeyboard] Error in synchronization: ${e}`);
@@ -176,14 +190,12 @@ export default class Provider extends React.Component {
     }
 
     console.log("...sync OK");
-    this.setState(
-      evolve({
-        inSync: {
-          status: T,
-          error: F
-        }
-      })
-    );
+    this.setState({
+      inSync: {
+        status: T,
+        error: F
+      }
+    });
   };
 
   closeSerial = () => {
@@ -200,10 +212,14 @@ export default class Provider extends React.Component {
       },
       async e => {
         if (e instanceof Error) {
-          throw new Error(e);
+          console.error(e);
+          this.setState({
+            fatalError: true
+          });
+          return;
         }
 
-        this.getData();
+        await this.getData();
         console.log("Connected!");
       }
     );
@@ -230,7 +246,7 @@ export default class Provider extends React.Component {
     return new Promise((res, rej) => {
       this.data$
         .take(1)
-        .takeUntil(of().delay(1000))
+        .takeUntil(of().delay(60000))
         .subscribe({
           next: message => {
             if (message.trim() === SERIAL_OK) {
@@ -245,15 +261,7 @@ export default class Provider extends React.Component {
           },
           error: e => {
             console.error("[sendCommand] error", e);
-            this.setState(
-              evolve({
-                fatalError: T,
-                inSync: {
-                  status: F,
-                  error: T
-                }
-              })
-            );
+            return rej(ERROR.FATAL);
           },
           complete: () => {
             rej(ERROR.RECOVER);
@@ -275,7 +283,14 @@ export default class Provider extends React.Component {
 
     const { comName } = keyboard;
 
-    this.createSerial(comName);
+    try {
+      this.createSerial(comName);
+    } catch (e) {
+      console.error(e);
+      this.setState({
+        fatalError: true
+      });
+    }
 
     this.setState({
       comName
@@ -285,14 +300,15 @@ export default class Provider extends React.Component {
   render() {
     const {
       palette,
-      layout,
-      activeColorIndex,
-      comName,
+      layouts,
       inSync,
-      fatalError
+      fatalError,
+      activeLayoutIndex,
+      activeColorIndex,
+      numberOfLayouts
     } = this.state;
 
-    const configurationLoaded = palette && layout;
+    const configurationLoaded = palette && layouts;
 
     return (
       <>
@@ -305,12 +321,15 @@ export default class Provider extends React.Component {
           <Store.Provider
             value={{
               palette,
-              layout,
+              layouts,
               inSync,
               fatalError,
+              activeLayoutIndex,
               activeColorIndex,
+              numberOfLayouts,
               setKeyColor: this.setKeyColor,
               setColorPalette: this.setColorPalette,
+              setLayer: this.setLayer,
               syncKeyboard: this.syncKeyboard,
               setColorIndexActive: this.setColorIndexActive,
               resetPalette: this.resetPalette

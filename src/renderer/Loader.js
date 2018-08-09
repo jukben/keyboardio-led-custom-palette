@@ -32,8 +32,9 @@ const Loader = ({ fatalError }) => (
     {fatalError && (
       <FatalErrorHelp>
         Something is terribly wrong. <br /> Most likely your firmware's missing
-        correct installation of "LEDCustomPalette" plugin <br />
-        Check out the documentation. Flash your Model01. Run this again. ❤️
+        correct installation of plugins.<br />
+        Make sure that serial connection is not busy.<br />Check out the
+        documentation. Flash your Model01. Run this again. ❤️
       </FatalErrorHelp>
     )}
   </Container>

@@ -12,6 +12,11 @@ export const getPaletteFromRGBArray = R.compose(
   R.map(R.join(" "))
 );
 
-export const getLayout = R.compose(R.map(x => +x), R.split(" "), R.trim);
+export const getLayouts = R.compose(
+  R.splitEvery(64),
+  R.map(x => +x),
+  R.split(" "),
+  R.trim
+);
 
-export const getLayoutFromArray = R.join(" ");
+export const getLayoutsFromArray = R.compose(R.join(" "), R.unnest);
