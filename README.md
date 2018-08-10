@@ -14,7 +14,7 @@
 
 ## Introduction
 
-<img src="https://user-images.githubusercontent.com/8135252/43836905-1e88cd3a-9b17-11e8-933e-072f88676dad.png" alt="Screenshot" title="Main screen"/>
+<img src="https://user-images.githubusercontent.com/8135252/43947453-70872b1e-9c88-11e8-8e3c-f59025c45d21.png" alt="Screenshot" title="Main screen"/>
 
 This is a small utility for my lovely keyboard – [Model01 Keyboard](https://shop.keyboard.io/) - it basically allows you to design your own color layout and then store it EEPROM thus it will be persisted in your keyboard.
 
@@ -26,7 +26,9 @@ The other way is to build the application by your own – see [Contributing](#co
 
 ## Usage
 
-To usage you have to enhance your Model01's firmware with [Kaleidoscope-LEDCustomPalette](https://github.com/jukben/Kaleidoscope-LEDCustomPalette). See the documentation for more information and example.
+> For the deprecated version 1.0.x you have to enhance your Model01's firmware with [Kaleidoscope-LEDCustomPalette](https://github.com/jukben/Kaleidoscope-LEDCustomPalette). See the documentation for more information and example.
+
+First thing you have to do is prepare you firmware. Namely you have to initialize those plugin `Focus`, `EEPROMSettings`, `LEDPaletteTheme` `ColormapEffect`, good thing is that all of them are pre-installed. That means you have to edit `#includes`, `KALEIDOSCOPE_INIT_PLUGINS`, and `setup` phase of you firmware. It might sound difficult especially if you are not familiar with it, the easiest should be just check it out the [example firmware](./example/Model01-LEDCustomPalette.ino) or my [very own personal firmware](https://github.com/jukben/Model01-Firmware) based on the default one. Both are fully configured for easy start with LED Custom Palette.
 
 Once you successfully flash your keyboard's firmware you should be able to run the application successfully. The LED Custom Palette then automatically find the serial port of your keyboard and if you have configured the plugin correctly you will be welcomed with a default state of the application with Palette, Layout and Status Bar component.
 
@@ -36,7 +38,9 @@ Left mouse click to select the active color. Signalized by small arrow pointing 
 
 Right mouse click to change the color itself.
 
-### Layout
+### Layout & Layer switch
+
+You can switch the layer you are creating color layout for.
 
 Left mouse click to set the specific keycap with the currently selected color.
 
