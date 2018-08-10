@@ -110,7 +110,7 @@ export default class Controls extends React.Component {
           }) => (
             <>
               <Help>
-                <SmallButton disabled={status} onClick={resetPalette}>
+                <SmallButton onClick={resetPalette}>
                   reset color palette
                 </SmallButton>
               </Help>

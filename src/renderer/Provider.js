@@ -1,7 +1,7 @@
 import React from "react";
 import SerialPort from "serialport";
 import { fromEvent, never, from, periodic, constant, of } from "most";
-import { evolve, always, clamp, adjust, F, T } from "ramda";
+import { evolve, always, clamp, equals, adjust, F, T } from "ramda";
 import {
   getRGBArrayFromPalette,
   getPaletteFromRGBArray,
@@ -56,6 +56,8 @@ export const ERROR = {
 export default class Provider extends React.Component {
   port = null;
   data$ = never();
+  palette = [];
+  layouts = [];
   reconnect$ = periodic(3000).observe(async e => {
     const { inSync: { error }, comName, fatalError } = this.state;
 
@@ -107,6 +109,9 @@ export default class Provider extends React.Component {
       return;
     }
 
+    this.palette = palette;
+    this.layouts = layouts;
+
     this.setState({
       numberOfLayouts: layouts.length,
       palette: palette,
@@ -127,26 +132,41 @@ export default class Provider extends React.Component {
     });
   };
 
+  isInSync = (updateState = true) => {
+    const paletteEquals = equals(this.palette, this.state.palette);
+    const layoutsEquals = equals(this.layouts, this.state.layouts);
+
+    updateState &&
+      this.setState(
+        evolve({
+          inSync: {
+            status: always(paletteEquals && layoutsEquals)
+          }
+        })
+      );
+
+    return {
+      paletteEquals,
+      layoutsEquals
+    };
+  };
+
   setColorPalette = (id, color) => {
     this.setState(
       evolve({
         palette: adjust(always(color), id),
-        activeColorIndex: always(id),
-        inSync: {
-          status: F
-        }
-      })
+        activeColorIndex: always(id)
+      }),
+      this.isInSync
     );
   };
 
   resetPalette = () => {
     this.setState(
       evolve({
-        palette: always(DEFAULT_PALETTE),
-        inSync: {
-          status: F
-        }
-      })
+        palette: always(DEFAULT_PALETTE)
+      }),
+      this.isInSync
     );
   };
 
@@ -158,11 +178,9 @@ export default class Provider extends React.Component {
         layouts: adjust(
           adjust(always(activeColorIndex), keyId),
           activeLayoutIndex
-        ),
-        inSync: {
-          status: F
-        }
-      })
+        )
+      }),
+      this.isInSync
     );
   };
 
@@ -174,15 +192,26 @@ export default class Provider extends React.Component {
 
   syncKeyboard = async () => {
     console.log("Attempt to sync the keyboard...");
-    const { palette, layouts } = this.state;
+    const { palette, layouts, activeLayoutIndex } = this.state;
 
     if (!palette || !layouts) {
       throw new Error("[syncKeyboard] Doesn't have a data to synchronize");
     }
 
+    const { layoutsEquals, paletteEquals } = this.isInSync(false);
+
     try {
-      // await this.sendCommand(`palette ${getPaletteFromRGBArray(palette)}`);
-      await this.sendCommand(`colormap.map ${getLayoutsFromArray(layouts)}`);
+      if (!paletteEquals) {
+        console.log("...palette sync...");
+        await this.sendCommand(`palette ${getPaletteFromRGBArray(palette)}`);
+      }
+
+      if (!layoutsEquals) {
+        console.log("...layout sync...");
+        await this.sendCommand(`colormap.map ${getLayoutsFromArray(layouts)}`);
+        // hacky way how to repain the keyboard
+        await this.sendCommand(`colormap.layer ${activeLayoutIndex}`);
+      }
     } catch (e) {
       this.errorReducer(e);
       console.error(`[syncKeyboard] Error in synchronization: ${e}`);
@@ -190,10 +219,14 @@ export default class Provider extends React.Component {
     }
 
     console.log("...sync OK");
+
+    this.palette = palette;
+    this.layouts = layouts;
+
     this.setState({
       inSync: {
-        status: T,
-        error: F
+        status: true,
+        error: false
       }
     });
   };
@@ -271,7 +304,13 @@ export default class Provider extends React.Component {
   }
 
   async connect() {
-    const serials = await SerialPort.list();
+    let serials = [];
+    try {
+      serials = await SerialPort.list();
+    } catch (e) {
+      console.error("[connect] cannot list all serials");
+    }
+
     const keyboard = serials.filter(
       ({ manufacturer, serialNumber = "" }) =>
         manufacturer === "Keyboardio" || serialNumber.match(/kbio/)
@@ -286,7 +325,7 @@ export default class Provider extends React.Component {
     try {
       this.createSerial(comName);
     } catch (e) {
-      console.error(e);
+      console.error("[connect] cannot establish a serial");
       this.setState({
         fatalError: true
       });

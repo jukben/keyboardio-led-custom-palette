@@ -44,6 +44,7 @@ const Picker = styled.div`
   top: 40px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 1;
 `;
 
 export default class BoxComponent extends React.Component {
