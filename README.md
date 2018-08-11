@@ -73,6 +73,9 @@ yarn build:mac
 # ... Win32
 yarn build:win
 
+# ... Linux
+yarn build:linux
+
 # run Jest's unit tests
 yarn test
 ```
