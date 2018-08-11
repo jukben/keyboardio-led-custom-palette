@@ -20,7 +20,7 @@ This is a small utility for my lovely keyboard – [Model01 Keyboard](https://sh
 
 ## Install
 
-To install this application [just grab a precompiled binary in releases](https://github.com/jukben/keyboardio-led-custom-palette/releases) (I'm supporting only Mac and Windows for now).
+To install this application [just grab a precompiled binary in releases](https://github.com/jukben/keyboardio-led-custom-palette/releases) (I'm supporting only Mac and Windows for now, with an experimental support of Linux/Debian).
 
 The other way is to build the application by your own – see [Contributing](#contributing).
 
@@ -57,8 +57,6 @@ Required [Node.js](http://nodejs.org/) (8+) stack.
 You should be able to build the project pretty easily by your own. Just `yarn` to install all dependencies.
 
 On Windows you would need a properly configured stack, I'd recommend [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools).
-
-Haven't tried Linux (PR welcomed 😉)
 
 ```bash
 # run application in development mode
