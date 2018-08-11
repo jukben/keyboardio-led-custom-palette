@@ -12,7 +12,8 @@
     "start": "electron-webpack dev",
     "compile": "electron-webpack",
     "build:mac": "yarn compile && electron-builder -m",
-    "build:win": "yarn compile && electron-builder -w"
+    "build:win": "yarn compile && electron-builder -w",
+    "build:linux": "yarn compile && electron-builder -l"
   },
   "build": {
     "appId": "com.jukben.lcp",
