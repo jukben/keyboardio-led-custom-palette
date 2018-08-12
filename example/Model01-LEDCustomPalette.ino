@@ -5,9 +5,10 @@
 #include "Kaleidoscope.h"
 #include "LED-Off.h"
 
-// hey, over there!
+// hey, over there! Important for LED Custom Palette!
 #include "Kaleidoscope-Focus.h"
 #include "Kaleidoscope-EEPROM-Settings.h"
+#include "Kaleidoscope-LED-Palette-Theme.h"
 #include "Kaleidoscope-Colormap.h"
 
 enum
