@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { Consumer } from "./Provider";
 
 const ErrorBox = styled.div`
@@ -97,46 +97,44 @@ const Status = styled.div`
   align-items: center;
 `;
 
-export default class Controls extends React.Component {
-  render() {
-    return (
-      <Container>
-        <Consumer>
-          {({
-            syncKeyboard,
-            fatalError,
-            inSync: { status, error },
-            resetPalette
-          }) => (
-            <>
-              <Help>
-                <SmallButton onClick={resetPalette}>
-                  reset color palette
-                </SmallButton>
-              </Help>
-              <Panel>
-                <Status>
-                  {error ? (
-                    <ErrorBox>
-                      {fatalError
-                        ? "There is an error within communication! Try to reconnect your keyboard. 🙏"
-                        : "There is an fatal error occurred. Try to restart the app. 😔"}
-                    </ErrorBox>
-                  ) : status ? (
-                    <Green>Everything is OK 👌</Green>
-                  ) : (
-                    <Red>Design is not synced with Model01! 🙅</Red>
-                  )}
-                </Status>
+const Controls = () => (
+  <Container>
+    <Consumer>
+      {({
+        syncKeyboard,
+        fatalError,
+        inSync: { status, error },
+        resetPalette
+      }) => (
+        <>
+          <Help>
+            <SmallButton onClick={resetPalette}>
+              reset color palette
+            </SmallButton>
+          </Help>
+          <Panel>
+            <Status>
+              {error ? (
+                <ErrorBox>
+                  {fatalError
+                    ? "There is an error within communication! Try to reconnect your keyboard. 🙏"
+                    : "There is an fatal error occurred. Try to restart the app. 😔"}
+                </ErrorBox>
+              ) : status ? (
+                <Green>Everything is OK 👌</Green>
+              ) : (
+                <Red>Design is not synced with Model01! 🙅</Red>
+              )}
+            </Status>
 
-                <Button onClick={syncKeyboard} disabled={status}>
-                  Synchronize! 🚀
-                </Button>
-              </Panel>
-            </>
-          )}
-        </Consumer>
-      </Container>
-    );
-  }
-}
+            <Button onClick={syncKeyboard} disabled={status}>
+              Synchronize! 🚀
+            </Button>
+          </Panel>
+        </>
+      )}
+    </Consumer>
+  </Container>
+);
+
+export default Controls;

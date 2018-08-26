@@ -37,11 +37,13 @@
     "styled-components": "^3.4.1"
   },
   "devDependencies": {
+    "@jukben/eslint-config": "^0.0.5",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.4.2",
     "electron": "2.0.0",
     "electron-builder": "^20.11.1",
     "electron-webpack": "^2.0.1",
+    "eslint": "^5.4.0",
     "jest": "^23.4.2",
     "webpack": "^4.8.1"
   },

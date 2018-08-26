@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { app, BrowserWindow, Menu, shell } from "electron";
 import { format as formatUrl } from "url";
 import * as path from "path";

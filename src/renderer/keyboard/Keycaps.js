@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { Consumer } from "../Provider";
 
 const Path = styled.path`
   fill: ${({ color }) => color};
@@ -27,7 +26,7 @@ class Keys extends React.Component {
       return <div>Loading</div>;
     }
 
-    const childrenWithProps = React.Children.map(children, (child, i) => {
+    const childrenWithProps = React.Children.map(children, child => {
       const { dataId, d } = child.props;
 
       const id = +dataId; // pointer into array
@@ -50,7 +49,7 @@ class Keys extends React.Component {
 
 export default class Keycaps extends React.PureComponent {
   render() {
-    const { layout, palette, set, map } = this.props;
+    const { set, map } = this.props;
 
     return (
       <Keys set={set} map={map}>

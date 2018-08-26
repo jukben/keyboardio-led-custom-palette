@@ -1,7 +1,7 @@
 import React from "react";
 import SerialPort from "serialport";
-import { fromEvent, never, from, periodic, constant, of } from "most";
-import { evolve, always, clamp, equals, adjust, F, T } from "ramda";
+import { fromEvent, never, periodic, of } from "most";
+import { evolve, always, clamp, equals, adjust, T } from "ramda";
 import {
   getRGBArrayFromPalette,
   getPaletteFromRGBArray,
@@ -9,7 +9,6 @@ import {
   getLayouts
 } from "../common/utils";
 import Loader from "./Loader";
-import { startOfISOWeek } from "date-fns";
 
 // http://alumni.media.mit.edu/~wad/color/palette.html
 const DEFAULT_PALETTE = [
@@ -34,7 +33,6 @@ const DEFAULT_PALETTE = [
 const DEFAULT_STATE = {
   palette: null,
   layouts: null,
-  comName: null,
   numberOfLayouts: 1,
   activeLayoutIndex: 0,
   activeColorIndex: 0,
@@ -44,6 +42,7 @@ const DEFAULT_STATE = {
 
 const Store = React.createContext(DEFAULT_STATE);
 
+// eslint-disable-next-line
 export const Consumer = Store.Consumer;
 
 export const SERIAL_OK = ".";
@@ -55,11 +54,18 @@ export const ERROR = {
 
 export default class Provider extends React.Component {
   port = null;
+
   data$ = never();
+
   palette = [];
+
   layouts = [];
-  reconnect$ = periodic(3000).observe(async e => {
-    const { inSync: { error }, comName, fatalError } = this.state;
+
+  reconnect$ = periodic(3000).observe(async () => {
+    const {
+      inSync: { error },
+      fatalError
+    } = this.state;
 
     // do not reconnect if are not facing any error.. or if error is fatal
     if (!error || fatalError) return;
@@ -72,6 +78,32 @@ export default class Provider extends React.Component {
 
   componentWillUnmount() {
     this.closeSerial();
+  }
+
+  async getData() {
+    let palette;
+    let layouts;
+    try {
+      palette = getRGBArrayFromPalette(await this.sendCommand("palette", true));
+      layouts = getLayouts(await this.sendCommand("colormap.map", true));
+    } catch (e) {
+      this.errorReducer(e);
+      return;
+    }
+
+    this.palette = palette;
+    this.layouts = layouts;
+
+    this.setState({
+      numberOfLayouts: layouts.length,
+      palette,
+      layouts,
+      fatalError: false,
+      inSync: {
+        status: true,
+        error: false
+      }
+    });
   }
 
   errorReducer = e => {
@@ -98,32 +130,6 @@ export default class Provider extends React.Component {
     }
   };
 
-  async getData() {
-    let palette;
-    let layouts;
-    try {
-      palette = getRGBArrayFromPalette(await this.sendCommand("palette", true));
-      layouts = getLayouts(await this.sendCommand("colormap.map", true));
-    } catch (e) {
-      this.errorReducer(e);
-      return;
-    }
-
-    this.palette = palette;
-    this.layouts = layouts;
-
-    this.setState({
-      numberOfLayouts: layouts.length,
-      palette: palette,
-      layouts: layouts,
-      fatalError: false,
-      inSync: {
-        status: true,
-        error: false
-      }
-    });
-  }
-
   setLayer = layerId => {
     const { layouts } = this.state;
 
@@ -133,10 +139,11 @@ export default class Provider extends React.Component {
   };
 
   isInSync = (updateState = true) => {
-    const paletteEquals = equals(this.palette, this.state.palette);
-    const layoutsEquals = equals(this.layouts, this.state.layouts);
+    const { palette, layouts } = this.state;
+    const paletteEquals = equals(this.palette, palette);
+    const layoutsEquals = equals(this.layouts, layouts);
 
-    updateState &&
+    if (updateState) {
       this.setState(
         evolve({
           inSync: {
@@ -144,6 +151,7 @@ export default class Provider extends React.Component {
           }
         })
       );
+    }
 
     return {
       paletteEquals,
@@ -171,7 +179,7 @@ export default class Provider extends React.Component {
   };
 
   setKeyColor = keyId => {
-    const { layouts, activeColorIndex, activeLayoutIndex } = this.state;
+    const { activeColorIndex, activeLayoutIndex } = this.state;
 
     this.setState(
       evolve({
@@ -236,6 +244,7 @@ export default class Provider extends React.Component {
   };
 
   createSerial(com) {
+    // eslint-disable-next-line
     const Readline = SerialPort.parsers.Readline;
 
     this.port = new SerialPort(
@@ -285,12 +294,11 @@ export default class Provider extends React.Component {
             if (message.trim() === SERIAL_OK) {
               if (reply) {
                 return rej(ERROR.FATAL);
-              } else {
-                return res(SERIAL_OK);
               }
+              return res(SERIAL_OK);
             }
 
-            res(message);
+            return res(message);
           },
           error: e => {
             console.error("[sendCommand] error", e);
@@ -330,10 +338,6 @@ export default class Provider extends React.Component {
         fatalError: true
       });
     }
-
-    this.setState({
-      comName
-    });
   }
 
   render() {
@@ -348,6 +352,8 @@ export default class Provider extends React.Component {
     } = this.state;
 
     const configurationLoaded = palette && layouts;
+
+    const { children } = this.props;
 
     return (
       <>
@@ -374,7 +380,7 @@ export default class Provider extends React.Component {
               resetPalette: this.resetPalette
             }}
           >
-            {this.props.children}
+            {children}
           </Store.Provider>
         )}
       </>

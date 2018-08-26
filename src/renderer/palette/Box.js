@@ -1,7 +1,6 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { ChromePicker } from "react-color";
-import { Consumer } from "../Provider";
 
 const Box = styled.div`
   background-color: ${({ color }) => color};
@@ -49,21 +48,25 @@ const Picker = styled.div`
 
 export default class BoxComponent extends React.Component {
   togglePicker = () => {
-    this.props.togglePicker(this.props.id);
+    const { togglePicker, id } = this.props;
+    togglePicker(id);
   };
 
   setColor = ({ rgb: { r, g, b } }) => {
+    const { setColorPalette, id } = this.props;
     const color = [r, g, b];
 
-    this.props.setColorPalette(this.props.id, color);
+    setColorPalette(id, color);
   };
 
   activateColor = () => {
-    this.props.setColorActive(this.props.id);
+    const { setColorActive, id } = this.props;
+
+    setColorActive(id);
   };
 
   render() {
-    const { color, picker, selected, togglePicker } = this.props;
+    const { color, picker, selected } = this.props;
     const [r, g, b] = color;
 
     return (

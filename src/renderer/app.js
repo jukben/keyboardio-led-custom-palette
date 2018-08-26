@@ -1,5 +1,4 @@
 import React from "react";
-import path from "path";
 import styled from "styled-components";
 
 import Keyboard from "./keyboard";
@@ -16,16 +15,14 @@ const Container = styled.div`
   align-items: center;
 `;
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <Provider>
-        <Container>
-          <Palette />
-          <Keyboard />
-          <Controls />
-        </Container>
-      </Provider>
-    );
-  }
-}
+const App = () => (
+  <Provider>
+    <Container>
+      <Palette />
+      <Keyboard />
+      <Controls />
+    </Container>
+  </Provider>
+);
+
+export default App;

@@ -1,5 +1,4 @@
 import React from "react";
-import path from "path";
 import styled, { css } from "styled-components";
 
 const LayerControlsContainer = styled.div`
@@ -45,23 +44,18 @@ const Layer = styled.div`
   }
 `;
 
-class LayerControls extends React.Component {
-  render() {
-    const { activeIndex, count } = this.props;
-    return (
-      <LayerControlsContainer>
-        {Array.from({ length: count }, (_, i) => i).map(i => {
-          const active = activeIndex === i;
-          return (
-            <Layer key={i} onClick={() => this.props.set(i)} active={active}>
-              {active && <Arrow />}
-              {i}
-            </Layer>
-          );
-        })}
-      </LayerControlsContainer>
-    );
-  }
-}
+const LayerControls = ({ activeIndex, count }) => (
+  <LayerControlsContainer>
+    {Array.from({ length: count }, (_, i) => i).map(i => {
+      const active = activeIndex === i;
+      return (
+        <Layer key={i} onClick={() => this.props.set(i)} active={active}>
+          {active && <Arrow />}
+          {i}
+        </Layer>
+      );
+    })}
+  </LayerControlsContainer>
+);
 
 export default LayerControls;

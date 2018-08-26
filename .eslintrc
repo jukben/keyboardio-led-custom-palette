@@ -1,0 +1,11 @@
+{
+  "extends": "@jukben",
+  "rules": {
+    "jsx-a11y/accessible-emoji": 0,
+    "no-nested-ternary": 0,
+    "no-console": 0,
+    "react/prop-types": 0,
+    "react/no-multi-comp": 0,
+    "react/no-unescaped-entities": 0
+  }
+}

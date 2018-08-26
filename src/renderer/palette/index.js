@@ -1,5 +1,4 @@
 import React from "react";
-import Color from "color";
 import styled from "styled-components";
 import Box from "./Box";
 import { Consumer } from "../Provider";
@@ -9,16 +8,11 @@ const Container = styled.div`
   margin: 20px;
 `;
 
-const EditButton = styled.button`
-  background: red;
-`;
-
 export default class Palette extends React.Component {
   ref = React.createRef();
 
   state = {
-    picker: null,
-    selected: 0
+    picker: null
   };
 
   componentDidMount() {
@@ -30,11 +24,13 @@ export default class Palette extends React.Component {
   }
 
   handleClick = e => {
+    const { picker } = this.props;
+
     if (this.ref.current.contains(e.target)) {
       return;
     }
 
-    if (this.state.picker === null) return;
+    if (picker === null) return;
 
     this.setState({
       picker: null
@@ -48,7 +44,7 @@ export default class Palette extends React.Component {
   };
 
   render() {
-    const { picker, selected } = this.state;
+    const { picker } = this.state;
 
     return (
       <Container innerRef={this.ref}>
@@ -65,6 +61,7 @@ export default class Palette extends React.Component {
 
             return palette.map((color, i) => (
               <Box
+                // eslint-disable-next-line
                 key={i}
                 id={i}
                 color={color}
