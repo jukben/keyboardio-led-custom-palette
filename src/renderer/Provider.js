@@ -288,7 +288,7 @@ export default class Provider extends React.Component {
     return new Promise((res, rej) => {
       this.data$
         .take(1)
-        .takeUntil(of().delay(60000))
+        .takeUntil(of().delay(3000))
         .subscribe({
           next: message => {
             if (message.trim() === SERIAL_OK) {

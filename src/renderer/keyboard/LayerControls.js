@@ -44,12 +44,12 @@ const Layer = styled.div`
   }
 `;
 
-const LayerControls = ({ activeIndex, count }) => (
+const LayerControls = ({ activeIndex, count, set }) => (
   <LayerControlsContainer>
     {Array.from({ length: count }, (_, i) => i).map(i => {
       const active = activeIndex === i;
       return (
-        <Layer key={i} onClick={() => this.props.set(i)} active={active}>
+        <Layer key={i} onClick={() => set(i)} active={active}>
           {active && <Arrow />}
           {i}
         </Layer>

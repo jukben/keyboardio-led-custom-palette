@@ -117,8 +117,8 @@ const Controls = () => (
               {error ? (
                 <ErrorBox>
                   {fatalError
-                    ? "There is an error within communication! Try to reconnect your keyboard. 🙏"
-                    : "There is an fatal error occurred. Try to restart the app. 😔"}
+                    ? "There is an fatal error occurred. Try to restart the app. 😔"
+                    : "There is an error within communication! Try to reconnect your keyboard. 🙏"}
                 </ErrorBox>
               ) : status ? (
                 <Green>Everything is OK 👌</Green>
