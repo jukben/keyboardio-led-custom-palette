@@ -6,7 +6,7 @@
 #include "LED-Off.h"
 
 // hey, over there! Important for LED Custom Palette!
-#include "Kaleidoscope-Focus.h"
+#include "Kaleidoscope-FocusSerial.h"
 #include "Kaleidoscope-EEPROM-Settings.h"
 #include "Kaleidoscope-LED-Palette-Theme.h"
 #include "Kaleidoscope-Colormap.h"
@@ -44,17 +44,15 @@ KALEIDOSCOPE_INIT_PLUGINS(
 void setup()
 {
     Kaleidoscope.setup();
+    
+    // start with LEDs off! To see your colorfull layout you have to turn them on manually!
     LEDOff.activate();
 
     // Important for LED Custom Palette, how many palettes we should reserve...
     ColormapEffect.max_layers(numberOfLayers);
+
     // ...let the keyboard know we're done with adding EEPROM plugins
     EEPROMSettings.seal();
-
-    // Important for LED Custom Palette
-    Focus.addHook(FOCUS_HOOK_LEDPALETTETHEME);
-    Focus.addHook(FOCUS_HOOK_COLORMAP);
-    Focus.addHook(FOCUS_HOOK_COLORMAP_LAYER);
 }
 
 void loop()
