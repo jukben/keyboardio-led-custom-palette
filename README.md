@@ -2,6 +2,8 @@
  <img src="https://user-images.githubusercontent.com/8135252/43808206-46044a9e-9aac-11e8-82d6-3d872724c87e.png" alt="LCD logo" title="LCD" />
 
 <h1>LED Custom Palette</h1>
+<h2>Archived. Please use https://github.com/keyboardio/Chrysalis</h2>
+
 </div>
 
 ## Table of Contents
